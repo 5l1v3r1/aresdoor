@@ -12,6 +12,13 @@
  * Can prevent system shutdown
  * Modify process name to "hide in plain sight" (default: System)
 
+### To-Do
+ * Add password-protection
+ * Create server-side application
+ * Encrypt/Decrypt TCP data sent to/from client/server
+ * Add support for Powershell command line
+ * Fix runtime error handling
+
 ***
 ### Version History
  * ### v1.2
@@ -27,32 +34,14 @@
    -  Initial Release
 
 ***
+
 ### Contribution
-Please feel free to modify any of the code to your likings. Let me know of any bugs found in the code.
+This, along with all other projects found in the Ares framework, is an experimental tool. Full stability is
+not currently guaranteed in this tool. Please report all errors by [submitting an issue](https://github.com/BlackVikingPro/aresdoor/issues/new).
+You may also feel free to fix any bugs yourself, and publish a new branch containing your fix. I will review
+all code changes, and then update to the master branch (along with return credit for fixing it) should the
+bug fix be programatically correct. Thanks!
 
-This is part of my ares* series. I will be releasing a lot more tools designed for Windows in C# soon.
-
-***
-### Checksums
-__Check Integtrity:__
-```bash
-root@localhost$ find -type f -exec md5sum "{}" + > checklist.chk
-root@localhost$ md5sum -c checklist.chk
-```
-__v1.2 Checksums:__
-```md5sum
-939de394a0c803dd6f87ac180e03a889  ./App.config
-62bde3677da3552fd8af958d83a80ba6  ./aresdoor.csproj
-aa2a791d5c2f5e38459f048e03dbcb6a  ./aresdoor.csproj.user
-3418b51bd12d09642d641613ac7c14e4  ./aresdoor.sln
-db0de0f38cbc2e0bfe381e15469b46ce  ./bin/Debug/aresdoor.exe
-939de394a0c803dd6f87ac180e03a889  ./bin/Debug/aresdoor.exe.config
-11458a328a9c5cb3e181985046e25ddd  ./bin/Debug/aresdoor.exe.manifest
-9ab2cabb1a79c47726dd14f2e08b33e8  ./bin/Debug/aresdoor.pdb
-443d06404ddae7f934840b707ff7f1cb  ./Program.cs
-fe7e22736538240fd830f05adc29a370  ./Properties/app.manifest
-d74a5577166d3a323f63d33f2f5e4108  ./Properties/AssemblyInfo.cs
-c7b12cac52b1fd145858d3b1e5f40e3a  ./Properties/Settings.Designer.cs
-d1926e8ab7ed6c40b08eb40d00c6108a  ./Properties/Settings.settings
-d41d8cd98f00b204e9800998ecf8427e  ./Settings.cs
-```
+### Disclaimer
+I am not responsible for any malicious use of this software. This is a free, and open-source software to anybody
+that would like to use it, and for any groups (personal, corporate, or military).
