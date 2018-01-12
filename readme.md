@@ -1,4 +1,4 @@
-# Aresdoor
+# Aresdoor v1.2
 ###  Yet another persistant backdoor for Windows, in C#
 ***
 
@@ -17,7 +17,6 @@
  * Create server-side application
  * Encrypt/Decrypt TCP data sent to/from client/server
  * Add support for Powershell command line
- * Fix runtime error handling
 
 ***
 ### Version History
