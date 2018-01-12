@@ -168,7 +168,7 @@ namespace aresdoor
              * 
              */
 
-#if DEBUG
+#if !DEBUG
             /* Hide console if debug mode is disabled. */
             var handle = GetConsoleWindow();
             ShowWindow(handle, SW_HIDE); // hide window
