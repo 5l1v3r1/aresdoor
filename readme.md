@@ -5,6 +5,8 @@
 
 **View [update history archive](https://github.com/BlackVikingPro/aresdoor/blob/beta/updates.md)**
 
+**Video: [Getting started with Aresdoor](https://www.youtube.com/watch?v=-GMkODaR4sU)**
+
 **Check out the [beta branch](https://github.com/BlackVikingPro/aresdoor/tree/beta)**
 
 ***
