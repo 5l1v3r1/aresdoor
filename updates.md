@@ -1,9 +1,17 @@
-# Current Version: v1.2.1
-See the project files: [BlackVikingPro/aresdoor](https://github.com/BlackVikingPro/aresdoor)
+# Current Version: v1.3
 
+See the **original** project files: [BlackVikingPro/aresdoor](https://github.com/BlackVikingPro/aresdoor)
+
+See the **beta** project files: [BlackVikingPro/aresdoor:beta](https://github.com/BlackVikingPro/tree/beta)
 ***
 
 ## Version History for Aresdoor
+ * ### v1.3 (major update)
+   - Rewired how the entire system works
+   - Added support for Powershell backdoors
+   - Moved some code to seperate header files
+   - Created options menu for attacker
+   - Extended support for error exceptions
  * ### v1.2.1
    - Cleaned up code structure
    - Added support for debugging

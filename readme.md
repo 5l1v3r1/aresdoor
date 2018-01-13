@@ -5,24 +5,18 @@
 
 **View [update history archive](https://github.com/BlackVikingPro/aresdoor/blob/beta/updates.md)**
 
-
 ***
 
 ### Features
- * Automatically modify registry to autorun on startup
- * 100% persistant backdoor
- * Silent exception escapes (so no noisy dialogs)
- * Checks for internet connection before sending backdoor
- * Command line switches for defining server and port
- * Can add self to registry for autorun on bootup
- * Can prevent system shutdown
- * Modify process name to "hide in plain sight" (default: System)
+ * Display Options Menu
+ * Works flawlessly on RAW TCP Socket Connections
+ * Command Prompt, and Powershell Backdoor Shells
+ * Minimalistic Code - Makes for Easy Deployment
 
 ### To-Do
- * Add password-protection
- * Create server-side application
- * Encrypt/Decrypt TCP data sent to/from client/server
- * Add support for Powershell command line
+ * Add Password Protection
+ * Create Server-Side Application
+ * Implement End-To-End Encryption
 
 ***
 
