@@ -5,6 +5,8 @@
 
 **View [update history archive](https://github.com/BlackVikingPro/aresdoor/blob/master/updates.md)**
 
+**Check out the [beta branch](https://github.com/BlackVikingPro/aresdoor/tree/beta)**
+
 ***
 
 ### Features
