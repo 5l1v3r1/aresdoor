@@ -14,9 +14,9 @@
  * Works flawlessly on RAW TCP Socket Connections
  * Command Prompt, and Powershell Backdoor Shells
  * Minimalistic Code - Makes for Easy Deployment
+ * Supports Password-Protection
 
 ### To-Do
- * Add Password Protection
  * Create Server-Side Application
  * Implement End-To-End Encryption
 
