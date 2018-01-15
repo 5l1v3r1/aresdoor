@@ -3,7 +3,7 @@
 
 **Read the [Aresdoor Wiki](https://github.com/BlackVikingPro/aresdoor/wiki)**
 
-**View [update history archive](https://github.com/BlackVikingPro/aresdoor/blob/beta/updates.md)**
+**View [update history archive](https://github.com/BlackVikingPro/aresdoor/blob/master/updates.md)**
 
 **Video: [Getting started with Aresdoor](https://www.youtube.com/watch?v=-GMkODaR4sU)**
 
