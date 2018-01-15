@@ -1,4 +1,4 @@
-# Aresdoor v1.3 (Stable Build)
+# Aresdoor v1.3.1 (Stable Build)
 ###  Yet another persistant backdoor for Windows, in C#
 
 **Read the [Aresdoor Wiki](https://github.com/BlackVikingPro/aresdoor/wiki)**
@@ -16,9 +16,9 @@
  * Works flawlessly on RAW TCP Socket Connections
  * Command Prompt, and Powershell Backdoor Shells
  * Minimalistic Code - Makes for Easy Deployment
+ * Supports Password-Protection
 
 ### To-Do
- * Add Password Protection
  * Create Server-Side Application
  * Implement End-To-End Encryption
 
