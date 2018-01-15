@@ -1,4 +1,4 @@
-# Aresdoor v1.3 (Beta Build)
+# Aresdoor v1.3.1 (Beta Build)
 ###  Yet another persistant backdoor for Windows, in C#
 
 **Read the [Aresdoor Wiki](https://github.com/BlackVikingPro/aresdoor/wiki)**
