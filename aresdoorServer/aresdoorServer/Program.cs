@@ -42,7 +42,12 @@ namespace aresdoorServer
                     // Send back a response.
                     tcpClient.GetStream().Write(msg, 0, msg.Length);
                 }
-            } catch (Exception exc) { if (exc is IOException) { tcpClient.Close(); Thread.CurrentThread.Abort(); } else { Console.WriteLine("SendResponse() Exception: {0}", exc); tcpClient.Close(); Thread.CurrentThread.Abort(); } }
+            } catch (Exception exc) {
+                if (exc is IOException)
+                { tcpClient.Close(); Thread.CurrentThread.Abort(); }
+                else
+                { Console.WriteLine("SendResponse() Exception: {0}", exc); tcpClient.Close(); Thread.CurrentThread.Abort(); }
+            }
         }
 
         public static void CloseTCPClient(TcpClient tcpClient)
